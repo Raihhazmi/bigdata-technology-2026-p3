@@ -1,24 +1,22 @@
-# 🚀 Modul Praktikum 2  
-## Batch Data Ingestion & Processing with Spark (Enterprise Edition)
+# 🚀 Modul Praktikum 3  
+## Batch Data Analytics & Visualization Layer with Spark and Power BI
 
-Repositori ini berisi implementasi pipeline data berbasis **Apache Spark (PySpark)** untuk memproses data transaksi harian e-commerce dalam skenario **Batch Processing**.
+![Dashboard Screenshot](reports/dashboard.png)
+*(Ganti placeholder ini dengan screenshot hasil akhir Power BI kamu)*
 
-Proyek ini merupakan bagian dari Praktikum **Big Data Technology**  
-Program Studi Teknologi Informasi – UIN Antasari.
+Repositori ini berisi kelanjutan implementasi *pipeline* data berbasis **Apache Spark (PySpark)**, yang kini diintegrasikan dengan **Microsoft Power BI** untuk membangun layer visualisasi dan *Business Intelligence* (BI).
+
+Proyek ini merupakan bagian dari Praktikum **Big Data Technology** Program Studi Teknologi Informasi – UIN Antasari.
 
 ---
 
 ## 📌 Deskripsi Proyek
 
-Proyek ini mensimulasikan pemrosesan data dalam volume besar yang tidak membutuhkan respons real-time (Batch Processing).
+Proyek ini mensimulasikan tahap akhir dari arsitektur Big Data modern: **Analytics & Visualization Layer**. 
 
-Data mentah:
-1. Dibersihkan (Data Cleaning)
-2. Ditransformasikan
-3. Dihitung metrik bisnisnya
-4. Disimpan ke dalam Data Lake
-
-Arsitektur penyimpanan menggunakan pendekatan **Medallion Architecture (Raw → Clean → Curated)** sehingga data siap digunakan untuk Business Intelligence (BI) dan analitik lanjutan.
+Melanjutkan dari arsitektur Medallion di Modul 2, data yang sudah bersih (*Curated*) diproses lebih lanjut menjadi *insight* bisnis:
+1. **Analytics Layer (PySpark):** Melakukan agregasi metrik bisnis (Total Revenue, Top Products, Revenue per Category) dan menyimpannya ke dalam *Serving Layer*.
+2. **Visualization Layer (Power BI):** Mengimpor data dari *Serving Layer* untuk membangun *dashboard* analitik interaktif yang siap digunakan oleh level manajerial dan eksekutif perusahaan untuk pengambilan keputusan.
 
 ---
 
@@ -26,170 +24,139 @@ Arsitektur penyimpanan menggunakan pendekatan **Medallion Architecture (Raw → 
 
 - **Bahasa Pemrograman**: Python 3
 - **Engine Pemrosesan Data**: Apache Spark (PySpark)
-- **Sistem Operasi**: Linux Environment (WSL - Ubuntu)
+- **Business Intelligence Platform**: Microsoft Power BI Desktop
+- **Visualisasi Python**: Matplotlib, Pandas
+- **Sistem Operasi**: Linux Environment (WSL - Ubuntu) & Windows
 - **Code Editor**: Visual Studio Code + Remote WSL Extension
-- **Format Penyimpanan**: Parquet (Columnar Storage)
+- **Format Penyimpanan**: Parquet (Data Lake) & CSV (Serving/BI Layer)
 
 ---
 
 ## 📂 Struktur Direktori
 
-Struktur proyek mengikuti standar Data Lake berlapis (Medallion Architecture):
+Struktur proyek kini memiliki tambahan layer untuk *Serving* dan laporan visual:
 
 ```text
 bigdata-project/
 ├── data/
 │   ├── raw/        # Data mentah (CSV)
 │   ├── clean/      # Data tervalidasi (Parquet)
-│   └── curated/    # Data siap analitik (Parquet)
+│   ├── curated/    # Data siap analitik (Parquet)
+│   └── serving/    # Data agregasi siap konsumsi BI (CSV)
+├── reports/        # Hasil export visualisasi (.png) & file Dashboard (.pbix)
 ├── logs/           # Log eksekusi pipeline
-└── scripts/
-    └── batch_pipeline_enterprise.py
+├── scripts/
+│   ├── batch_pipeline_enterprise.py
+│   └── analytics_visualization.py
+└── README.md
 ```
+# ⚙️ Setup & Instalasi
 
----
+## 1️⃣ Persiapan PySpark & Dependensi Python
+(Pastikan setup **WSL** dan **Java 17** dari Modul 2 sudah berjalan)
 
-## ⚙️ Setup & Instalasi
-
-### 1️⃣ Persiapan WSL & Dependensi
-
-Pastikan WSL (Ubuntu) sudah terinstal:
+Aktifkan virtual environment dan tambahkan library visualisasi:
 
 ```bash
-wsl --install
+source venv/bin/activate
+pip install pyspark pandas matplotlib
 ```
+----
+# 2️⃣ Persiapan Power BI
 
-Update sistem dan instal Java 17 (Spark berjalan di atas JVM):
+Unduh dan instal Microsoft Power BI Desktop di sistem Windows Anda melalui tautan resmi Microsoft atau Microsoft Store.
+-----
 
-```bash
-sudo apt update
-sudo apt install openjdk-17-jdk -y
-```
+🚀 Cara Menjalankan Pipeline & Visualisasi
+Langkah 1: Generate Analytics Data (Serving Layer)
 
-Instal Python dan Virtual Environment:
-
-```bash
-sudo apt install python3-full python3-venv python3-pip -y
-```
-
----
-
-### 2️⃣ Integrasi VS Code
-
-- Install extension **WSL**
-- Install extension **Python**
-- Buka proyek melalui:
-  
-  ```
-  WSL: New Window → Open Folder
-  ```
+Buka terminal di VS Code (mode WSL)
 
 - Aktifkan virtual environment:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install pyspark
 ```
-
----
-
-### 3️⃣ Persiapan Dataset
-
-Letakkan file berikut ke dalam folder:
-
-```
-data/raw/ecommerce_raw.csv
-```
-
----
-
-## 🚀 Cara Menjalankan Pipeline
-
-1. Buka terminal di VS Code (mode WSL).
-2. Aktifkan virtual environment:
-
-```bash
 source venv/bin/activate
 ```
-
-3. Jalankan pipeline:
-
-```bash
-python scripts/batch_pipeline_enterprise.py
+- Jalankan skrip agregasi Spark untuk membuat data metrik:
 ```
+python scripts/analytics_visualization.py
+```
+Output yang dihasilkan:
+ - File CSV metrik di folder data/serving/
+ - Gambar grafik dasar di folder reports/
 
-4. Jika berhasil, folder berikut akan terisi:
+ ----
+# Langkah 2: Build Power BI Dashboard
 
-- `data/clean/`
-- `data/curated/`
+1. Buka Power BI Desktop
+2. Pilih Get Data → Text/CSV
+3. Muat file CSV dari folder data/serving/
+4. Buat visualisasi berikut:
 
-Semua data tersimpan dalam format **Parquet** dan sudah dipartisi.
+KPI Card
+- Total Revenue → total_revenue.csv
+Clustered Bar Chart
+- Top 5 Products → top_products.csv
+- Sort Descending
+Clustered Bar Chart
+- Revenue per Category → category_revenue.csv
 
----
+Layout Dashboard
 
-## 🧠 Konsep yang Diimplementasikan
-
-### ✅ Explicit Schema
-Menggunakan schema eksplisit untuk:
-- Menghindari kesalahan tipe data
-- Performa lebih cepat dibanding `inferSchema`
-
-### ✅ Data Cleaning & Validation
-- Menghapus duplikasi
-- Menghapus nilai null
-- Menyaring harga & kuantitas > 0
-- Validasi format tanggal
-
-### ✅ Business Aggregation
-Menghasilkan metrik:
-- Total Revenue per Category
-- Top 5 Produk berdasarkan kuantitas
-- Average Transaction Value per Customer
-
-### ✅ Partition Strategy (Partition Pruning)
-Data dipartisi berdasarkan kolom `category` untuk:
-- Mempercepat query
-- Mengurangi I/O
-- Optimasi performa analitik
-
-### ✅ Storage Optimization
-Menggunakan **Parquet (Columnar Format)** yang:
-- Lebih kecil ukuran filenya
-- Lebih cepat untuk query agregasi
-- Mendukung predicate pushdown
+Tambahkan Text Box dengan:
+- Judul:
+```
+E-Commerce Sales Dashboard
+```
+Subtitle:
+```
+Batch Analytics – Big Data Technology
+```
+Simpan file sebagai:
+```
+reports/dashboard_ecommerce.pbix
+```
+# 🧠 Konsep yang Diimplementasikan
+✅ Serving Layer Pattern
+Mengubah data Data Lake (Parquet) yang masif menjadi tabel agregasi kecil (CSV) yang sangat cepat di-load oleh tools BI.
+Hal ini mengurangi beban query pada sistem dan mempercepat proses rendering visualisasi.
+✅ Key Performance Indicator (KPI) Design
+Menentukan dan menghitung metrik utama yang relevan untuk bisnis, seperti Total Revenue, agar performa e-commerce dapat dipahami secara cepat oleh stakeholder.
+✅ Data Visualization Principles
+MEmilih jenis grafik yang tepat:
+- Bar Chart → untuk perbandingan kategori atau produk
+- Sorting data → agar insight langsung terlihat tanpa analisis manual.
+----
 
 ---
 
 ## 📊 Output Pipeline
 
-Layer yang dihasilkan:
+Arsitektur data yang dihasilkan dari awal hingga akhir:
 
-| Layer    | Format   | Kegunaan |
-|----------|----------|----------|
-| Raw      | CSV      | Data mentah |
-| Clean    | Parquet  | Data tervalidasi |
-| Curated  | Parquet  | Data siap BI & Analytics |
+| Layer / Tahap   | Teknologi | Format  | Kegunaan                              |
+|-----------------|-----------|---------|----------------------------------------|
+| Raw             | CSV       | CSV     | Data mentah sumber                     |
+| Clean / Curated | PySpark   | Parquet | Data tervalidasi & siap analitik       |
+| Serving         | PySpark   | CSV     | Data agregasi ringan untuk BI          |
+| Visualization   | Power BI  | .pbix   | Dashboard interaktif                   |
 
----
-
-## 📈 Use Case
+----
+📈 Use Case & Pengembangan Lanjutan
 
 Pipeline ini dapat dikembangkan lebih lanjut untuk:
+- Integrasi otomatisasi penjadwalan dengan Apache Airflow
+- Deployment ke ekosistem Cloud
+  - AWS S3
+  - GCP Cloud Storage
+- Pembuatan filter interaktif (Slicer) berdasarkan rentang tanggal di Power BI
+----
+👨‍💻 Author
 
-- Integrasi dengan Apache Airflow
-- Deployment ke AWS S3 / GCP
-- Integrasi dengan Power BI / Tableau
-- Implementasi Data Quality Framework
-- Real Enterprise Data Engineering Project
-
----
-
-## 👨‍💻 Author
-
-Muhammad Raihan Azmi  
-Praktikum Big Data Technology – 2026  
-Program Studi Teknologi Informasi  
+- Muhammad Raihan Azmi
+- Praktikum Big Data Technology – 2026
+Program Studi Teknologi Informasi
 UIN Antasari
 
----
+```
+Jika Anda mau, saya juga bisa bantu membuat **versi README.md yang lebih profesional seperti repository GitHub (lengkap dengan badge, arsitektur pipeline diagram, dan struktur folder project)** supaya terlihat seperti **project Big Data production-ready**.
+```
